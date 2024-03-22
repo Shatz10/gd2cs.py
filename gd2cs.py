@@ -16,8 +16,8 @@ import subprocess
 
 
 # Name of the file to be converted :
-filename = "Input.gd"
-outname = "Output.cs"
+filename = "debugUi.gd"
+outname = "debugUi.cs"
 strip_tabs = 4 # Replace 4 subsequent spaces at the beginning of a line with a tab so offset patterns can match them. Applied before all other patterns.
 rename_functions = 0; # Rename all function calls and declarations
 rename_vars = 0; # Rename all fields and local variables and accessed variables (of the first degree only, because it's impossible to know if a gd script was referenced) 
@@ -930,7 +930,7 @@ def _try_replace(text,replacer,repeat = None):
 # Convert file from gd to cs
 def process_file(filename,outname):
 	# Open the file in read/write mode
-	with open(filename,'r+') as f:
+	with open(filename,'r+', encoding='utf-8') as f:
 		text = f.read()
 		
 		print("PROCESSING -- " + filename)
@@ -1005,9 +1005,14 @@ def process_file(filename,outname):
 
 		print(outname)
 		class_name = regex.findall(fr"([^/]*)(?=\.cs)",outname,flags)[0];
+
+		# match = regex.search(r"[^\\/]+\.cs$", outname)
+		match = regex.search(r"([^\\/]+)(?=\.cs$)", outname)
+		class_name = match.group()
+
 		print(class_name)
 		text = f"{header}\n{'[Tool]' if tool else ''}\npublic class {class_name} : {extending}\n{{\n" + text + "\n}";
-		with open(outname,'w') as wf:
+		with open(outname,'w', encoding='utf-8') as wf:
 			wf.write(text);
 			print("SUCCESS -- " + outname)
 
